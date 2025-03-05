@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+# sunshine_output
+sunshine_output/

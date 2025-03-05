@@ -8,32 +8,26 @@ import webbrowser
 import sys
 from pathlib import Path
 
-# Add Sunshine directory to Python path
-SUNSHINE_DIR = Path("Sunshine")  # Path to the cloned Sunshine repository
+SUNSHINE_DIR = Path("Sunshine")
 if not SUNSHINE_DIR.exists():
     raise RuntimeError(f"Sunshine directory not found at {SUNSHINE_DIR}. Please ensure you have cloned it.")
-
 sys.path.append(str(SUNSHINE_DIR))
-import sunshine  # Import sunshine from the cloned repository
+import sunshine
 
-# Derive filenames from the current working directory
 folder_name = os.path.basename(os.getcwd())
 SBOM_FILE = f"{folder_name}-sbom.json"
 VUL_FILE = f"{folder_name}-sbomVUL.json"
-OUTPUT_DIR = "sunshine_output"  # Changed from SUNSHINE_DIR to avoid confusion
+OUTPUT_DIR = "sunshine_output"
 HTML_OUTPUT = "index.html"
 
-# Check if Grype is installed
 if not shutil.which("grype"):
     raise RuntimeError(
         "Grype is not installed. Please install it via Chocolatey (`choco install grype`) "
         "or download from https://github.com/anchore/grype/releases and add to PATH."
     )
-
-# Create output directory in the current working directory
 Path(OUTPUT_DIR).mkdir(exist_ok=True)
 
-# Generate SBOM for the current environment
+# Generate SBOM
 subprocess.run([
     "cyclonedx-py", "environment",
     "--outfile", str(Path(OUTPUT_DIR) / SBOM_FILE)
@@ -53,20 +47,17 @@ sunshine.visualize(
     output=str(Path(OUTPUT_DIR) / HTML_OUTPUT)
 )
 
-# Start the Granian server with the WSGI app from the project directory
-project_dir = Path(__file__).parent  # Fixed __file__ reference
+# Start the Granian server
+project_dir = Path(__file__).parent
 server_process = subprocess.Popen([
     "granian", "--interface", "wsgi", 
     f"{project_dir / 'application'}:application"
 ], cwd=os.getcwd())
 
-# Wait briefly for the server to start
 time.sleep(2)
 
-# Open the HTML output in the browser
 webbrowser.open(f"http://127.0.0.1:8000/{OUTPUT_DIR}/{HTML_OUTPUT}")
 
-# Keep the script running until interrupted
 try:
     server_process.wait()
 except KeyboardInterrupt:
