@@ -5,6 +5,7 @@ import shutil
 import os
 import time
 import sys
+import webbrowser
 from pathlib import Path
 
 SUNSHINE_DIR = Path("Sunshine")
@@ -54,3 +55,9 @@ subprocess.run([
 
 # Wait briefly for the server to start
 time.sleep(2)
+
+# Open the generated HTML file in the default browser
+html_file_path = Path(OUTPUT_DIR) / HTML_OUTPUT
+html_file_absolute = html_file_path.resolve()
+print(f"Opening visualization in browser: {html_file_absolute}")
+webbrowser.open(f"file://{html_file_absolute}")
