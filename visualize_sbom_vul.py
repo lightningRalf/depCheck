@@ -4,7 +4,6 @@ import subprocess
 import shutil
 import os
 import time
-import webbrowser
 import sys
 from pathlib import Path
 
@@ -19,12 +18,19 @@ SBOM_FILE = f"{folder_name}-sbom.json"
 VUL_FILE = f"{folder_name}-sbomVUL.json"
 OUTPUT_DIR = "sunshine_output"
 HTML_OUTPUT = "index.html"
+SUNSHINE_SCRIPT = Path("Sunshine") / "sunshine.py"
 
+# Check prerequisites
+if not SUNSHINE_SCRIPT.exists():
+    raise RuntimeError(f"Sunshine script not found at {SUNSHINE_SCRIPT}. Please ensure it's in the Sunshine directory.")
 if not shutil.which("grype"):
-    raise RuntimeError(
-        "Grype is not installed. Please install it via Chocolatey (`choco install grype`) "
-        "or download from https://github.com/anchore/grype/releases and add to PATH."
-    )
+    raise RuntimeError("Grype is not installed...")
+if not shutil.which("cyclonedx-py"):
+    raise RuntimeError("cyclonedx-py is not installed... Install with `pip install cyclonedx-bom`")
+if not shutil.which("granian"):
+    raise RuntimeError("Granian is not installed... Install with `pip install granian`")
+
+# Create output directory
 Path(OUTPUT_DIR).mkdir(exist_ok=True)
 
 # Generate SBOM
@@ -40,25 +46,13 @@ with open(vul_path, "w") as f:
         "grype", f"sbom:{Path(OUTPUT_DIR) / SBOM_FILE}", "-o", "cyclonedx-json"
     ], stdout=f, check=True)
 
-# Generate HTML visualization with Sunshine
-sunshine.visualize(
-    sbom=str(Path(OUTPUT_DIR) / SBOM_FILE),
-    vulns=str(vul_path),
-    output=str(Path(OUTPUT_DIR) / HTML_OUTPUT)
-)
+# Generate HTML visualization with Sunshine via CLI
+# Note: This only processes the SBOM file, as per the provided sunshine.py
+subprocess.run([
+    sys.executable, str(SUNSHINE_SCRIPT),
+    "-i", str(Path(OUTPUT_DIR) / SBOM_FILE),
+    "-o", str(Path(OUTPUT_DIR) / HTML_OUTPUT)
+], check=True)
 
-# Start the Granian server
-project_dir = Path(__file__).parent
-server_process = subprocess.Popen([
-    "granian", "--interface", "wsgi", 
-    f"{project_dir / 'application'}:application"
-], cwd=os.getcwd())
-
+# Wait briefly for the server to start
 time.sleep(2)
-
-webbrowser.open(f"http://127.0.0.1:8000/{OUTPUT_DIR}/{HTML_OUTPUT}")
-
-try:
-    server_process.wait()
-except KeyboardInterrupt:
-    server_process.terminate()
