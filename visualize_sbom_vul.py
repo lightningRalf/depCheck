@@ -27,8 +27,6 @@ if not shutil.which("grype"):
     raise RuntimeError("Grype is not installed...")
 if not shutil.which("cyclonedx-py"):
     raise RuntimeError("cyclonedx-py is not installed... Install with `pip install cyclonedx-bom`")
-if not shutil.which("granian"):
-    raise RuntimeError("Granian is not installed... Install with `pip install granian`")
 
 # Create output directory
 Path(OUTPUT_DIR).mkdir(exist_ok=True)
