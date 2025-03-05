@@ -15,11 +15,7 @@ Before running the script, ensure you have the following installed:
    ```
    git clone https://github.com/CycloneDX/Sunshine.git
    ```
-3. **cyclonedx-py** - Python SBOM generator
-   ```
-   pip install cyclonedx-bom
-   ```
-4. **Grype** - Vulnerability scanner
+3. **Grype** - Vulnerability scanner
    - **Windows** (via [Chocolatey](https://chocolatey.org/)):
      ```
      choco install grype
@@ -33,7 +29,10 @@ Before running the script, ensure you have the following installed:
    ```
    git clone https://github.com/CycloneDX/Sunshine.git
    ```
-3. Ensure all prerequisites are installed and available in your PATH
+3. Install dependencies via `uv`
+    ```
+    uv sync
+    ```
 
 ## Usage
 
