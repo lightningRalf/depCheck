@@ -53,9 +53,12 @@ sunshine.visualize(
     output=str(Path(OUTPUT_DIR) / HTML_OUTPUT)
 )
 
-# Start the Granian server from the project directory, serving from the current directory
-project_dir = Path(__file__).parent
-server_process = subprocess.Popen([str(project_dir / "granian_server.exe")], cwd=os.getcwd())
+# Start the Granian server with the WSGI app from the project directory
+project_dir = Path(__file__).parent  # Fixed __file__ reference
+server_process = subprocess.Popen([
+    "granian", "--interface", "wsgi", 
+    f"{project_dir / 'application'}:application"
+], cwd=os.getcwd())
 
 # Wait briefly for the server to start
 time.sleep(2)
