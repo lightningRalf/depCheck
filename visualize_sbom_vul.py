@@ -59,17 +59,38 @@ OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 # Function to detect dependency file and select cyclonedx-py command
 def get_cyclonedx_command(work_dir, sbom_path):
     """Detect available dependency files and return the appropriate cyclonedx-py command."""
+    # Check if uv is available in the system
+    has_uv = shutil.which("uv") is not None
+    debug_print(f"UV package manager available: {has_uv}")
+    
     dependency_files = [
-    ("pyproject.toml", ["cyclonedx-py", "poetry", str(work_dir), "-o", str(sbom_path)]),
+        ("pyproject.toml", ["cyclonedx-py", "poetry", str(work_dir), "-o", str(sbom_path)]),
         ("requirements.txt", ["cyclonedx-py", "requirements", "-r", str(work_dir / "requirements.txt"), "-o", str(sbom_path)]),
         ("Pipfile", ["cyclonedx-py", "pipenv", "--pipfile", str(work_dir / "Pipfile"), "-o", str(sbom_path)]),
         ("setup.py", ["cyclonedx-py", "environment", "-o", str(sbom_path)]),  # Fallback for setup.py
     ]
     
+    # Check for uv-specific files if uv is available
+    if has_uv:
+        uv_cmd = ["uv", "tool", "run", "--from", "cyclonedx-bom", "cyclonedx-py", "environment"]
+        
+        # Try to get Python path from uv
+        try:
+            python_path = subprocess.check_output(["uv", "python", "find"], text=True).strip()
+            debug_print(f"UV Python path: {python_path}")
+            uv_cmd.append(python_path)
+        except subprocess.SubprocessError:
+            debug_print("Failed to get Python path from uv, using default")
+        
+        uv_cmd.extend(["--outfile", str(sbom_path)])
+        debug_print(f"Using UV command: {' '.join(uv_cmd)}")
+        return uv_cmd
+    
     for file_name, cmd in dependency_files:
         if (work_dir / file_name).exists():
             debug_print(f"Found {file_name}, using command: {' '.join(cmd)}")
             return cmd
+    
     
     # Fallback to environment if no dependency file is found
     debug_print("No dependency file found, falling back to environment scan")
@@ -121,3 +142,6 @@ debug_print(f"Opening visualization in browser: {html_file_absolute}")
 print(f"Opening visualization in browser: {html_file_absolute}")
 print(f"Timestamped files created at: {timestamp}")
 webbrowser.open(f"file://{html_file_absolute}")
+
+# use the following command to execute it in different directories
+# & uv run "C:\Users\mjpa\ProgrammierProjekte\depCheck\visualize_sbom_vul.py"
