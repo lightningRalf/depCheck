@@ -1,7 +1,7 @@
 [project]
 name = "depcheck"
 version = "0.1.0"
-description = "Add your description here"
+description = "Dependency checker for known vulnerabilities for python - SBOM from cyclonedx - vulnerabilities from grype."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
