@@ -64,6 +64,10 @@ All output files are stored in the `docs/sunshine_output` directory:
   - `index-{timestamp}.html` - Timestamped visualization
   - `index.html` - Latest visualization (this is what opens in your browser)
 
+## License
+
+This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
+
 ## Troubleshooting
 
 If you encounter any issues:
