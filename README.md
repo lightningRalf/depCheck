@@ -32,10 +32,10 @@ Before running the script, ensure you have the following installed:
 
 ## Usage
 
-Run the visualization script:
+Run the visualization script from the folder you want analysed:
 
 ```
-uv run visualize_sbom_vul.py
+uv run C:\path\to\your\folder\visualize_sbom_vul.py
 ```
 
 The script will:
