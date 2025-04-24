@@ -10,12 +10,8 @@ Before running the script, ensure you have the following installed:
     ```
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
     ```
-
-2. **Sunshine** - CycloneDX visualization tool
-   ```
-   git clone https://github.com/CycloneDX/Sunshine.git
-   ```
-3. **Grype** - Vulnerability scanner
+    
+2. **Grype** - Vulnerability scanner
    - **Windows** (via [Chocolatey](https://chocolatey.org/)):
      ```
      choco install grype
